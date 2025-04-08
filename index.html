@@ -70,6 +70,9 @@
         th:first-child, td:first-child {
             text-align: left;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -80,19 +83,20 @@
             <input type="number" id="loanAmount" min="0" step="1000">
         </div>
         <div class="form-group">
-            <label>Interest Rate (%):</label>
-            <input type="number" id="interestRate" min="0" max="100" step="0.01">
-        </div>
-        <div class="form-group">
             <label>Loan Term (Years):</label>
             <input type="number" id="loanTerm" min="1" max="30" value="15">
         </div>
         <div class="form-group">
-            <label>Loan Type:</label>
+            <label>Financing Option:</label>
             <select id="loanType">
-                <option value="hmdf">HMDF (35% of income)</option>
-                <option value="bank">Bank (40% of income)</option>
+                <option value="hmdf">HMDF (6.25% interest)</option>
+                <option value="rcbc">RCBC (6.6% interest)</option>
+                <option value="other">Other Banks</option>
             </select>
+        </div>
+        <div class="form-group" id="customRateGroup" style="display: none;">
+            <label>Custom Interest Rate (%):</label>
+            <input type="number" id="customRate" min="0" max="100" step="0.01">
         </div>
         <div class="form-group">
             <button id="calculateBtn" class="btn">Calculate</button>
@@ -115,6 +119,17 @@
     </div>
     <script>
         const calculateBtn = document.getElementById('calculateBtn');
+        const loanTypeSelect = document.getElementById('loanType');
+        const customRateGroup = document.getElementById('customRateGroup');
+
+        // Show/hide custom rate field based on loan type selection
+        loanTypeSelect.addEventListener('change', function() {
+            if (this.value === 'other') {
+                customRateGroup.style.display = 'block';
+            } else {
+                customRateGroup.style.display = 'none';
+            }
+        });
 
         // Function to format numbers with commas and 2 decimal places
         function formatNumber(num) {
@@ -126,13 +141,33 @@
 
         calculateBtn.addEventListener('click', () => {
             const amount = parseFloat(document.getElementById('loanAmount').value);
-            const rate = parseFloat(document.getElementById('interestRate').value);
             const term = parseInt(document.getElementById('loanTerm').value);
             const loanType = document.getElementById('loanType').value;
             const resultTable = document.getElementById('resultsTable');
             const resultBody = document.getElementById('resultsBody');
 
-            if (!amount || !rate || !term) return alert('Please complete all fields.');
+            if (!amount || !term) return alert('Please complete all required fields.');
+
+            // Determine interest rate based on loan type
+            let rate;
+            if (loanType === 'hmdf') {
+                rate = 6.25;
+            } else if (loanType === 'rcbc') {
+                rate = 6.6;
+            } else {
+                rate = parseFloat(document.getElementById('customRate').value);
+                if (!rate) return alert('Please enter the custom interest rate.');
+            }
+
+            // Determine income requirement divisor based on loan type
+            let incomeDivisor;
+            if (loanType === 'hmdf') {
+                incomeDivisor = 0.35;
+            } else if (loanType === 'rcbc') {
+                incomeDivisor = 0.30;
+            } else {
+                incomeDivisor = 0.40;
+            }
 
             resultBody.innerHTML = '';
             resultTable.style.display = 'block';
@@ -143,9 +178,8 @@
             const total = monthly * n;
             const interest = total - amount;
             
-            // Calculate income requirement based on loan type
-            const incomeMultiplier = loanType === 'hmdf' ? 0.35 : 0.40;
-            const incomeReq = monthly / incomeMultiplier;
+            // Calculate income requirement
+            const incomeReq = monthly / incomeDivisor;
 
             resultBody.innerHTML = `
                 <tr>
