@@ -6,72 +6,172 @@
     <title>Loan Calculator</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
             color: #333;
+            background-color: #f5f7fa;
         }
         h1 {
             color: #2c3e50;
             text-align: center;
             margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3498db;
         }
         .calculator-container {
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: bold;
+            color: #2c3e50;
         }
         input[type="number"], select {
             width: 100%;
-            padding: 8px;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input[type="number"]:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
         }
         .btn {
             background-color: #3498db;
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
+            padding: 12px 20px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            display: inline-block;
         }
         .btn:hover {
             background-color: #2980b9;
         }
+        .btn-calculate {
+            background-color: #2ecc71;
+            width: 100%;
+            margin-top: 10px;
+            padding: 14px;
+        }
+        .btn-calculate:hover {
+            background-color: #27ae60;
+        }
         .results-table {
-            margin-top: 20px;
+            margin-top: 30px;
             display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 15px;
         }
         th, td {
-            padding: 10px;
+            padding: 12px 15px;
             text-align: right;
             border-bottom: 1px solid #ddd;
         }
         th {
             background-color: #f2f2f2;
+            font-weight: bold;
+            color: #2c3e50;
         }
         th:first-child, td:first-child {
             text-align: left;
         }
-        .hidden {
-            display: none;
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .loanable-amount {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-weight: bold;
+            text-align: center;
+            font-size: 18px;
+            border-left: 4px solid #3498db;
+        }
+        .term-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .term-option {
+            flex: 1;
+            min-width: 120px;
+        }
+        .term-button {
+            width: 100%;
+            text-align: center;
+            background-color: #f8f9fa;
+            border: 2px solid #ddd;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .term-button:hover {
+            background-color: #e9ecef;
+            border-color: #3498db;
+        }
+        .term-button.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+        .section-title {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+            color: #2c3e50;
+        }
+        .input-hint {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        .special-term-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .special-term-input {
+            flex: 1;
+        }
+        @media (max-width: 768px) {
+            .term-options {
+                flex-direction: column;
+            }
+            .special-term-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
     </style>
 </head>
@@ -79,13 +179,25 @@
     <h1>Loan Calculator</h1>
     <div class="calculator-container">
         <div class="form-group">
-            <label>Loan Amount (₱):</label>
-            <input type="number" id="loanAmount" min="0" step="1000">
+            <label>Total Outstanding Obligation (₱):</label>
+            <input type="number" id="totalObligation" min="0" step="1000" placeholder="Enter amount">
         </div>
+        
         <div class="form-group">
-            <label>Loan Term (Years):</label>
-            <input type="number" id="loanTerm" min="1" max="30" value="15">
+            <label>Reservation Fee (₱):</label>
+            <input type="number" id="reservationFee" min="0" step="1000" value="0" placeholder="Enter fee">
         </div>
+        
+        <div class="form-group">
+            <label>Discount (₱):</label>
+            <input type="number" id="discount" min="0" step="1000" value="0" placeholder="Enter discount">
+            <div class="input-hint">Total Loanable Amount = Outstanding Obligation - Reservation Fee - Discount</div>
+        </div>
+        
+        <div class="loanable-amount">
+            Total Loanable Amount: ₱<span id="loanableAmount">0.00</span>
+        </div>
+        
         <div class="form-group">
             <label>Financing Option:</label>
             <select id="loanType">
@@ -94,13 +206,50 @@
                 <option value="other">Other Banks</option>
             </select>
         </div>
+        
         <div class="form-group" id="customRateGroup" style="display: none;">
             <label>Custom Interest Rate (%):</label>
-            <input type="number" id="customRate" min="0" max="100" step="0.01">
+            <input type="number" id="customRate" min="0" max="100" step="0.01" placeholder="Enter rate">
         </div>
+        
+        <h3 class="section-title">Loan Term Options</h3>
+        
         <div class="form-group">
-            <button id="calculateBtn" class="btn">Calculate</button>
+            <label>Regular Loan Terms:</label>
+            <div class="term-options">
+                <div class="term-option">
+                    <div class="term-button" data-years="30">30 Years</div>
+                </div>
+                <div class="term-option">
+                    <div class="term-button" data-years="25">25 Years</div>
+                </div>
+                <div class="term-option">
+                    <div class="term-button" data-years="20">20 Years</div>
+                </div>
+                <div class="term-option">
+                    <div class="term-button" data-years="15">15 Years</div>
+                </div>
+                <div class="term-option">
+                    <div class="term-button" data-years="10">10 Years</div>
+                </div>
+                <div class="term-option">
+                    <div class="term-button" data-years="5">5 Years</div>
+                </div>
+            </div>
         </div>
+        
+        <div class="form-group">
+            <label>Special Loan Term:</label>
+            <div class="special-term-container">
+                <div class="special-term-input">
+                    <input type="number" id="specialTerm" min="1" max="40" placeholder="Enter years">
+                </div>
+                <button id="calculateSpecialBtn" class="btn">Apply Special Term</button>
+            </div>
+        </div>
+        
+        <button id="calculateBtn" class="btn btn-calculate">Calculate Loan</button>
+        
         <div class="results-table" id="resultsTable">
             <h3>Loan Summary</h3>
             <table>
@@ -118,77 +267,157 @@
         </div>
     </div>
     <script>
-        const calculateBtn = document.getElementById('calculateBtn');
-        const loanTypeSelect = document.getElementById('loanType');
-        const customRateGroup = document.getElementById('customRateGroup');
-
-        // Show/hide custom rate field based on loan type selection
-        loanTypeSelect.addEventListener('change', function() {
-            if (this.value === 'other') {
-                customRateGroup.style.display = 'block';
-            } else {
-                customRateGroup.style.display = 'none';
-            }
-        });
-
-        // Function to format numbers with commas and 2 decimal places
-        function formatNumber(num) {
-            return num.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-        }
-
-        calculateBtn.addEventListener('click', () => {
-            const amount = parseFloat(document.getElementById('loanAmount').value);
-            const term = parseInt(document.getElementById('loanTerm').value);
-            const loanType = document.getElementById('loanType').value;
-            const resultTable = document.getElementById('resultsTable');
-            const resultBody = document.getElementById('resultsBody');
-
-            if (!amount || !term) return alert('Please complete all required fields.');
-
-            // Determine interest rate based on loan type
-            let rate;
-            if (loanType === 'hmdf') {
-                rate = 6.25;
-            } else if (loanType === 'rcbc') {
-                rate = 6.6;
-            } else {
-                rate = parseFloat(document.getElementById('customRate').value);
-                if (!rate) return alert('Please enter the custom interest rate.');
-            }
-
-            // Determine income requirement divisor based on loan type
-            let incomeDivisor;
-            if (loanType === 'hmdf') {
-                incomeDivisor = 0.35;
-            } else if (loanType === 'rcbc') {
-                incomeDivisor = 0.30;
-            } else {
-                incomeDivisor = 0.40;
-            }
-
-            resultBody.innerHTML = '';
-            resultTable.style.display = 'block';
-
-            const monthlyRate = (rate / 100) / 12;
-            const n = term * 12;
-            const monthly = (amount * monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1);
-            const total = monthly * n;
-            const interest = total - amount;
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculateBtn = document.getElementById('calculateBtn');
+            const calculateSpecialBtn = document.getElementById('calculateSpecialBtn');
+            const loanTypeSelect = document.getElementById('loanType');
+            const customRateGroup = document.getElementById('customRateGroup');
+            const termButtons = document.querySelectorAll('.term-button');
             
-            // Calculate income requirement
-            const incomeReq = monthly / incomeDivisor;
-
-            resultBody.innerHTML = `
-                <tr>
-                    <td>${term}</td>
-                    <td>₱${formatNumber(monthly)}</td>
-                    <td>₱${formatNumber(incomeReq)}</td>
-                    <td>₱${formatNumber(interest)}</td>
-                    <td>₱${formatNumber(total)}</td>
-                </tr>`;
+            const totalObligationInput = document.getElementById('totalObligation');
+            const reservationFeeInput = document.getElementById('reservationFee');
+            const discountInput = document.getElementById('discount');
+            const loanableAmountSpan = document.getElementById('loanableAmount');
+            const specialTermInput = document.getElementById('specialTerm');
+            
+            let selectedTerm = 15; // Default term
+            
+            // Update loanable amount when inputs change
+            [totalObligationInput, reservationFeeInput, discountInput].forEach(input => {
+                input.addEventListener('input', updateLoanableAmount);
+            });
+            
+            function updateLoanableAmount() {
+                const totalObligation = parseFloat(totalObligationInput.value) || 0;
+                const reservationFee = parseFloat(reservationFeeInput.value) || 0;
+                const discount = parseFloat(discountInput.value) || 0;
+                
+                const loanableAmount = totalObligation - reservationFee - discount;
+                loanableAmountSpan.textContent = formatNumber(loanableAmount > 0 ? loanableAmount : 0);
+            }
+            
+            // Show/hide custom rate field based on loan type selection
+            loanTypeSelect.addEventListener('change', function() {
+                if (this.value === 'other') {
+                    customRateGroup.style.display = 'block';
+                } else {
+                    customRateGroup.style.display = 'none';
+                }
+            });
+            
+            // Set active term button
+            termButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    termButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Set selected term
+                    selectedTerm = parseInt(this.getAttribute('data-years'));
+                    
+                    // Clear special term input
+                    specialTermInput.value = '';
+                });
+            });
+            
+            // Set default active term (15 years)
+            document.querySelector('[data-years="15"]').classList.add('active');
+            
+            // Apply special term
+            calculateSpecialBtn.addEventListener('click', function() {
+                const specialTerm = parseInt(specialTermInput.value);
+                
+                if (!specialTerm || specialTerm <= 0 || specialTerm > 40) {
+                    alert('Please enter a valid loan term between 1 and 40 years.');
+                    return;
+                }
+                
+                // Remove active class from all regular term buttons
+                termButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Set selected term to special term
+                selectedTerm = specialTerm;
+            });
+            
+            // Function to format numbers with commas and 2 decimal places
+            function formatNumber(num) {
+                if (isNaN(num)) return "0.00";
+                return num.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+            
+            // Calculate loan when Calculate button is clicked
+            calculateBtn.addEventListener('click', function() {
+                const totalObligation = parseFloat(totalObligationInput.value);
+                
+                if (!totalObligation) {
+                    alert('Please enter the Total Outstanding Obligation.');
+                    return;
+                }
+                
+                const reservationFee = parseFloat(reservationFeeInput.value) || 0;
+                const discount = parseFloat(discountInput.value) || 0;
+                
+                const amount = totalObligation - reservationFee - discount;
+                
+                if (amount <= 0) {
+                    alert('Loanable amount must be greater than 0.');
+                    return;
+                }
+                
+                const loanType = document.getElementById('loanType').value;
+                const resultTable = document.getElementById('resultsTable');
+                const resultBody = document.getElementById('resultsBody');
+                
+                // Determine interest rate based on loan type
+                let rate;
+                if (loanType === 'hmdf') {
+                    rate = 6.25;
+                } else if (loanType === 'rcbc') {
+                    rate = 6.6;
+                } else {
+                    rate = parseFloat(document.getElementById('customRate').value);
+                    if (!rate) {
+                        alert('Please enter the custom interest rate.');
+                        return;
+                    }
+                }
+                
+                // Determine income requirement divisor based on loan type
+                let incomeDivisor;
+                if (loanType === 'hmdf') {
+                    incomeDivisor = 0.35;
+                } else if (loanType === 'rcbc') {
+                    incomeDivisor = 0.30;
+                } else {
+                    incomeDivisor = 0.40;
+                }
+                
+                resultBody.innerHTML = '';
+                resultTable.style.display = 'block';
+                
+                const monthlyRate = (rate / 100) / 12;
+                const n = selectedTerm * 12;
+                const monthly = (amount * monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1);
+                const total = monthly * n;
+                const interest = total - amount;
+                
+                // Calculate income requirement
+                const incomeReq = monthly / incomeDivisor;
+                
+                resultBody.innerHTML = `
+                    <tr>
+                        <td>${selectedTerm}</td>
+                        <td>₱${formatNumber(monthly)}</td>
+                        <td>₱${formatNumber(incomeReq)}</td>
+                        <td>₱${formatNumber(interest)}</td>
+                        <td>₱${formatNumber(total)}</td>
+                    </tr>`;
+            });
         });
     </script>
 </body>
