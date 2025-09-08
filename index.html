@@ -211,6 +211,109 @@
             cursor: pointer;
             font-weight: normal;
         }
+        
+        /* Print-specific styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #calculator-print, #calculator-print * {
+                visibility: visible;
+            }
+            #calculator-print {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+        }
+        
+        /* Print preview container */
+        #print-preview {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 10000;
+            overflow: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        #calculator-print {
+            width: 8.5in;
+            min-height: 11in;
+            margin: 0 auto;
+            padding: 0.5in;
+            box-sizing: border-box;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .print-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 15px;
+        }
+        
+        .print-section {
+            margin-bottom: 25px;
+        }
+        
+        .print-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .print-label {
+            font-weight: bold;
+            width: 40%;
+        }
+        
+        .print-value {
+            width: 60%;
+        }
+        
+        .print-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .print-table th, .print-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: right;
+        }
+        
+        .print-table th:first-child, .print-table td:first-child {
+            text-align: left;
+        }
+        
+        .print-table th {
+            background-color: #f2f2f2;
+        }
+        
+        .close-preview {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 10001;
+            font-size: 16px;
+        }
+        
         @media (max-width: 768px) {
             body {
                 font-size: 18px;
@@ -350,6 +453,13 @@
             <button id="downloadBtn" class="btn btn-download">Download As PNG</button>
         </div>
     </div>
+    
+    <!-- Print Preview Container -->
+    <div id="print-preview">
+        <button class="close-preview" id="closePreview">Close Preview</button>
+        <div id="calculator-print"></div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const calculateBtn = document.getElementById('calculateBtn');
@@ -361,6 +471,9 @@
             const displayOptions = document.getElementById('displayOptions');
             const showInterestCheckbox = document.getElementById('showInterest');
             const showTotalPaymentCheckbox = document.getElementById('showTotalPayment');
+            const printPreview = document.getElementById('print-preview');
+            const calculatorPrint = document.getElementById('calculator-print');
+            const closePreview = document.getElementById('closePreview');
             
             const totalObligationInput = document.getElementById('totalObligation');
             const reservationFeeInput = document.getElementById('reservationFee');
@@ -369,6 +482,7 @@
             const specialTermInput = document.getElementById('specialTerm');
             
             let selectedTerm = 15; // Default term
+            let currentResults = null;
             
             // Update loanable amount when inputs change
             [totalObligationInput, reservationFeeInput, discountInput].forEach(input => {
@@ -537,6 +651,21 @@
                 // Calculate income requirement
                 const incomeReq = monthly / incomeDivisor;
                 
+                // Store results for printing
+                currentResults = {
+                    totalObligation,
+                    reservationFee,
+                    discount,
+                    amount,
+                    loanType,
+                    rate,
+                    selectedTerm,
+                    monthly,
+                    incomeReq,
+                    interest,
+                    total
+                };
+                
                 resultBody.innerHTML = `
                     <tr>
                         <td>${selectedTerm} Years</td>
@@ -550,6 +679,11 @@
                 downloadBtn.style.display = 'inline-block';
             });
             
+            // Close print preview
+            closePreview.addEventListener('click', function() {
+                printPreview.style.display = 'none';
+            });
+            
             // Download as PNG functionality
             downloadBtn.addEventListener('click', function() {
                 // Add a temporary message for better UX
@@ -557,28 +691,113 @@
                 downloadBtn.textContent = "Generating image...";
                 downloadBtn.disabled = true;
                 
-                // Capture the calculator container
-                html2canvas(document.getElementById('calculator'), {
-                    scale: 2, // Higher resolution
-                    logging: false,
-                    useCORS: true
-                }).then(function(canvas) {
-                    // Create download link
-                    const link = document.createElement('a');
-                    link.download = 'loan-calculator-result.png';
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                    
-                    // Restore button text
-                    downloadBtn.textContent = originalText;
-                    downloadBtn.disabled = false;
-                }).catch(function(error) {
-                    console.error('Error generating image:', error);
-                    alert('Error generating image. Please try again.');
-                    downloadBtn.textContent = originalText;
-                    downloadBtn.disabled = false;
-                });
+                // Generate print preview
+                generatePrintPreview();
+                
+                // Wait a moment for the preview to render
+                setTimeout(function() {
+                    // Capture the print preview container
+                    html2canvas(calculatorPrint, {
+                        scale: 2, // Higher resolution
+                        logging: false,
+                        useCORS: true,
+                        width: 8.5 * 96, // 8.5 inches at 96 DPI
+                        height: 11 * 96, // 11 inches at 96 DPI
+                        windowWidth: 8.5 * 96,
+                        windowHeight: 11 * 96
+                    }).then(function(canvas) {
+                        // Create download link
+                        const link = document.createElement('a');
+                        link.download = 'loan-calculator-result.png';
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                        
+                        // Hide print preview
+                        printPreview.style.display = 'none';
+                        
+                        // Restore button text
+                        downloadBtn.textContent = originalText;
+                        downloadBtn.disabled = false;
+                    }).catch(function(error) {
+                        console.error('Error generating image:', error);
+                        alert('Error generating image. Please try again.');
+                        downloadBtn.textContent = originalText;
+                        downloadBtn.disabled = false;
+                    });
+                }, 500);
             });
+            
+            function generatePrintPreview() {
+                if (!currentResults) return;
+                
+                // Show print preview
+                printPreview.style.display = 'block';
+                
+                // Generate content for print preview
+                const loanTypeText = {
+                    'hmdf': 'HMDF (6.25% interest)',
+                    'rcbc': 'RCBC (6.6% interest)',
+                    'other': `Other Banks (${currentResults.rate}% interest)`
+                }[currentResults.loanType];
+                
+                const showInterest = document.getElementById('showInterest').checked;
+                const showTotalPayment = document.getElementById('showTotalPayment').checked;
+                
+                calculatorPrint.innerHTML = `
+                    <div class="print-header">
+                        <h1>Loan Calculator Results</h1>
+                        <p>Generated on ${new Date().toLocaleDateString()}</p>
+                    </div>
+                    
+                    <div class="print-section">
+                        <h2>Loan Details</h2>
+                        <div class="print-row">
+                            <div class="print-label">Total Outstanding Obligation:</div>
+                            <div class="print-value">₱${formatNumber(currentResults.totalObligation)}</div>
+                        </div>
+                        <div class="print-row">
+                            <div class="print-label">Reservation Fee:</div>
+                            <div class="print-value">₱${formatNumber(currentResults.reservationFee)}</div>
+                        </div>
+                        <div class="print-row">
+                            <div class="print-label">Discount:</div>
+                            <div class="print-value">₱${formatNumber(currentResults.discount)}</div>
+                        </div>
+                        <div class="print-row">
+                            <div class="print-label">Total Loanable Amount:</div>
+                            <div class="print-value">₱${formatNumber(currentResults.amount)}</div>
+                        </div>
+                        <div class="print-row">
+                            <div class="print-label">Financing Option:</div>
+                            <div class="print-value">${loanTypeText}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="print-section">
+                        <h2>Loan Summary</h2>
+                        <table class="print-table">
+                            <thead>
+                                <tr>
+                                    <th>Term (Years)</th>
+                                    <th>Monthly Payment</th>
+                                    <th>Income Requirement</th>
+                                    ${showInterest ? '<th>Total Interest</th>' : ''}
+                                    ${showTotalPayment ? '<th>Total Payment</th>' : ''}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${currentResults.selectedTerm} Years</td>
+                                    <td>₱${formatNumber(currentResults.monthly)}</td>
+                                    <td>₱${formatNumber(currentResults.incomeReq)}</td>
+                                    ${showInterest ? `<td>₱${formatNumber(currentResults.interest)}</td>` : ''}
+                                    ${showTotalPayment ? `<td>₱${formatNumber(currentResults.total)}</td>` : ''}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
         });
     </script>
 </body>
