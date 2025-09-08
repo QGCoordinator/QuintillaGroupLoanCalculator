@@ -14,6 +14,7 @@
             padding: 20px;
             color: #333;
             background-color: #f5f7fa;
+            font-size: 16px;
         }
         h1 {
             color: #2c3e50;
@@ -21,12 +22,14 @@
             margin-bottom: 30px;
             padding-bottom: 15px;
             border-bottom: 2px solid #3498db;
+            font-size: 32px;
         }
         .calculator-container {
             background-color: white;
             border-radius: 10px;
             padding: 25px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            font-size: 18px;
         }
         .form-group {
             margin-bottom: 20px;
@@ -36,29 +39,30 @@
             margin-bottom: 8px;
             font-weight: bold;
             color: #2c3e50;
+            font-size: 18px;
         }
         input[type="number"], select {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
+            padding: 14px;
+            border: 2px solid #ddd;
             border-radius: 6px;
             box-sizing: border-box;
-            font-size: 16px;
+            font-size: 18px;
             transition: border-color 0.3s;
         }
         input[type="number"]:focus, select:focus {
             border-color: #3498db;
             outline: none;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
         }
         .btn {
             background-color: #3498db;
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 14px 24px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             transition: background-color 0.3s;
             display: inline-block;
@@ -70,7 +74,8 @@
             background-color: #2ecc71;
             width: 100%;
             margin-top: 10px;
-            padding: 14px;
+            padding: 16px;
+            font-size: 20px;
         }
         .btn-calculate:hover {
             background-color: #27ae60;
@@ -79,6 +84,8 @@
             background-color: #9b59b6;
             margin-top: 20px;
             display: none;
+            font-size: 18px;
+            padding: 14px 24px;
         }
         .btn-download:hover {
             background-color: #8e44ad;
@@ -87,6 +94,7 @@
             margin-top: 30px;
             display: none;
             animation: fadeIn 0.5s ease-in;
+            font-size: 18px;
         }
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -96,16 +104,19 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+            font-size: 18px;
         }
         th, td {
-            padding: 12px 15px;
+            padding: 16px 18px;
             text-align: right;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 2px solid #ddd;
+            font-size: 18px;
         }
         th {
             background-color: #f2f2f2;
             font-weight: bold;
             color: #2c3e50;
+            font-size: 19px;
         }
         th:first-child, td:first-child {
             text-align: left;
@@ -115,18 +126,18 @@
         }
         .loanable-amount {
             background-color: #e8f4fc;
-            padding: 15px;
+            padding: 18px;
             border-radius: 6px;
             margin: 20px 0;
             font-weight: bold;
             text-align: center;
-            font-size: 18px;
-            border-left: 4px solid #3498db;
+            font-size: 22px;
+            border-left: 5px solid #3498db;
         }
         .term-options {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 15px;
         }
         .term-option {
@@ -138,11 +149,12 @@
             text-align: center;
             background-color: #f8f9fa;
             border: 2px solid #ddd;
-            padding: 12px;
+            padding: 14px;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s;
             font-weight: bold;
+            font-size: 18px;
         }
         .term-button:hover {
             background-color: #e9ecef;
@@ -157,11 +169,12 @@
             margin-top: 25px;
             margin-bottom: 15px;
             padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 2px solid #eee;
             color: #2c3e50;
+            font-size: 22px;
         }
         .input-hint {
-            font-size: 12px;
+            font-size: 16px;
             color: #7f8c8d;
             margin-top: 5px;
         }
@@ -177,13 +190,53 @@
             text-align: center;
             margin-top: 25px;
         }
+        .toggle-container {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .toggle-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toggle-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .toggle-option label {
+            margin-bottom: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
         @media (max-width: 768px) {
+            body {
+                font-size: 18px;
+                padding: 15px;
+            }
+            .calculator-container {
+                padding: 20px;
+                font-size: 18px;
+            }
             .term-options {
                 flex-direction: column;
             }
             .special-term-container {
                 flex-direction: column;
                 align-items: stretch;
+            }
+            input[type="number"], select {
+                font-size: 16px;
+            }
+            .btn {
+                font-size: 16px;
+                padding: 12px 20px;
+            }
+            .toggle-container {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
@@ -261,18 +314,32 @@
             </div>
         </div>
         
+        <div class="form-group" id="displayOptions" style="display: none;">
+            <label>Display Options:</label>
+            <div class="toggle-container">
+                <div class="toggle-option">
+                    <input type="checkbox" id="showInterest" checked>
+                    <label for="showInterest">Show Total Interest</label>
+                </div>
+                <div class="toggle-option">
+                    <input type="checkbox" id="showTotalPayment" checked>
+                    <label for="showTotalPayment">Show Total Payment</label>
+                </div>
+            </div>
+        </div>
+        
         <button id="calculateBtn" class="btn btn-calculate">Calculate Loan</button>
         
         <div class="results-table" id="resultsTable">
-            <h3>Loan Summary</h3>
+            <h3 class="section-title">Loan Summary</h3>
             <table>
                 <thead>
                     <tr>
                         <th>Term (Years)</th>
                         <th>Monthly Payment</th>
                         <th>Income Requirement</th>
-                        <th>Total Interest</th>
-                        <th>Total Payment</th>
+                        <th class="interest-column">Total Interest</th>
+                        <th class="payment-column">Total Payment</th>
                     </tr>
                 </thead>
                 <tbody id="resultsBody"></tbody>
@@ -291,6 +358,9 @@
             const customRateGroup = document.getElementById('customRateGroup');
             const termButtons = document.querySelectorAll('.term-button');
             const downloadBtn = document.getElementById('downloadBtn');
+            const displayOptions = document.getElementById('displayOptions');
+            const showInterestCheckbox = document.getElementById('showInterest');
+            const showTotalPaymentCheckbox = document.getElementById('showTotalPayment');
             
             const totalObligationInput = document.getElementById('totalObligation');
             const reservationFeeInput = document.getElementById('reservationFee');
@@ -312,6 +382,13 @@
                 
                 const loanableAmount = totalObligation - reservationFee - discount;
                 loanableAmountSpan.textContent = formatNumber(loanableAmount > 0 ? loanableAmount : 0);
+                
+                // Show display options if loanable amount is greater than 0
+                if (loanableAmount > 0) {
+                    displayOptions.style.display = 'block';
+                } else {
+                    displayOptions.style.display = 'none';
+                }
             }
             
             // Show/hide custom rate field based on loan type selection
@@ -357,7 +434,36 @@
                 
                 // Set selected term to special term
                 selectedTerm = specialTerm;
+                
+                // Force a recalculation if there's already a result
+                if (document.getElementById('resultsTable').style.display === 'block') {
+                    calculateBtn.click();
+                }
             });
+            
+            // Toggle column visibility based on checkbox changes
+            showInterestCheckbox.addEventListener('change', function() {
+                toggleColumnVisibility('interest-column', this.checked);
+            });
+            
+            showTotalPaymentCheckbox.addEventListener('change', function() {
+                toggleColumnVisibility('payment-column', this.checked);
+            });
+            
+            function toggleColumnVisibility(columnClass, isVisible) {
+                // Get all table headers and cells with the specified class
+                const headerCells = document.querySelectorAll(`th.${columnClass}`);
+                const dataCells = document.querySelectorAll(`td.${columnClass}`);
+                
+                // Toggle visibility for all matching elements
+                headerCells.forEach(cell => {
+                    cell.style.display = isVisible ? '' : 'none';
+                });
+                
+                dataCells.forEach(cell => {
+                    cell.style.display = isVisible ? '' : 'none';
+                });
+            }
             
             // Function to format numbers with commas and 2 decimal places
             function formatNumber(num) {
@@ -418,6 +524,10 @@
                 resultBody.innerHTML = '';
                 resultTable.style.display = 'block';
                 
+                // Apply initial visibility settings
+                toggleColumnVisibility('interest-column', showInterestCheckbox.checked);
+                toggleColumnVisibility('payment-column', showTotalPaymentCheckbox.checked);
+                
                 const monthlyRate = (rate / 100) / 12;
                 const n = selectedTerm * 12;
                 const monthly = (amount * monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1);
@@ -429,11 +539,11 @@
                 
                 resultBody.innerHTML = `
                     <tr>
-                        <td>${selectedTerm}</td>
+                        <td>${selectedTerm} Years</td>
                         <td>₱${formatNumber(monthly)}</td>
                         <td>₱${formatNumber(incomeReq)}</td>
-                        <td>₱${formatNumber(interest)}</td>
-                        <td>₱${formatNumber(total)}</td>
+                        <td class="interest-column">₱${formatNumber(interest)}</td>
+                        <td class="payment-column">₱${formatNumber(total)}</td>
                     </tr>`;
                 
                 // Show download button
@@ -442,13 +552,31 @@
             
             // Download as PNG functionality
             downloadBtn.addEventListener('click', function() {
+                // Add a temporary message for better UX
+                const originalText = downloadBtn.textContent;
+                downloadBtn.textContent = "Generating image...";
+                downloadBtn.disabled = true;
+                
                 // Capture the calculator container
-                html2canvas(document.getElementById('calculator')).then(function(canvas) {
+                html2canvas(document.getElementById('calculator'), {
+                    scale: 2, // Higher resolution
+                    logging: false,
+                    useCORS: true
+                }).then(function(canvas) {
                     // Create download link
                     const link = document.createElement('a');
                     link.download = 'loan-calculator-result.png';
                     link.href = canvas.toDataURL('image/png');
                     link.click();
+                    
+                    // Restore button text
+                    downloadBtn.textContent = originalText;
+                    downloadBtn.disabled = false;
+                }).catch(function(error) {
+                    console.error('Error generating image:', error);
+                    alert('Error generating image. Please try again.');
+                    downloadBtn.textContent = originalText;
+                    downloadBtn.disabled = false;
                 });
             });
         });
