@@ -236,11 +236,42 @@
                 left: 0;
                 top: 0;
                 width: 100%;
-                padding: 20px;
+                padding: 15px;
                 box-sizing: border-box;
+                font-size: 12px;
             }
             .no-print {
                 display: none !important;
+            }
+            .print-header h1 {
+                font-size: 20px;
+                margin: 0 0 10px 0;
+            }
+            .print-header h2 {
+                font-size: 16px;
+                margin: 0 0 10px 0;
+            }
+            .print-header p {
+                font-size: 12px;
+                margin: 0 0 15px 0;
+            }
+            .print-section {
+                margin-bottom: 15px;
+            }
+            .print-section h3 {
+                font-size: 14px;
+                margin: 10px 0;
+            }
+            .print-row {
+                margin-bottom: 5px;
+                font-size: 12px;
+            }
+            .print-table {
+                font-size: 11px;
+            }
+            .print-table th, 
+            .print-table td {
+                padding: 6px;
             }
         }
         
@@ -263,7 +294,7 @@
             width: 8.5in;
             min-height: 11in;
             margin: 0 auto;
-            padding: 0.5in;
+            padding: 0.4in;
             box-sizing: border-box;
             background: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -272,18 +303,34 @@
         
         .print-header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 2px solid #3498db;
-            padding-bottom: 15px;
+            padding-bottom: 10px;
+        }
+        
+        .print-header h1 {
+            font-size: 24px;
+            margin: 0 0 5px 0;
+        }
+        
+        .print-header h2 {
+            font-size: 18px;
+            margin: 0 0 5px 0;
+        }
+        
+        .print-header p {
+            margin: 0;
+            font-size: 14px;
         }
         
         .print-section {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         
         .print-row {
             display: flex;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
         
         .print-label {
@@ -298,12 +345,13 @@
         .print-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 10px;
+            font-size: 13px;
         }
         
         .print-table th, .print-table td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 8px;
             text-align: right;
         }
         
@@ -735,6 +783,11 @@
             
             // Download as PNG functionality
             downloadBtn.addEventListener('click', function() {
+                if (!currentResults) {
+                    alert('Please calculate a loan first.');
+                    return;
+                }
+                
                 // Add a temporary message for better UX
                 const originalText = downloadBtn.textContent;
                 downloadBtn.textContent = "Generating image...";
@@ -755,9 +808,14 @@
                         windowWidth: 8.5 * 96,
                         windowHeight: 11 * 96
                     }).then(function(canvas) {
-                        // Create download link
+                        // Create download link with client name in filename
+                        const clientName = clientNameInput.value.trim();
+                        const fileName = clientName ? 
+                            `loan-calculator-${clientName.replace(/\s+/g, '-').toLowerCase()}.png` : 
+                            'loan-calculator-result.png';
+                        
                         const link = document.createElement('a');
-                        link.download = 'loan-calculator-result.png';
+                        link.download = fileName;
                         link.href = canvas.toDataURL('image/png');
                         link.click();
                         
