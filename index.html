@@ -41,7 +41,7 @@
             color: #2c3e50;
             font-size: 18px;
         }
-        input[type="number"], select {
+        input[type="text"], input[type="number"], select {
             width: 100%;
             padding: 14px;
             border: 2px solid #ddd;
@@ -50,7 +50,7 @@
             font-size: 18px;
             transition: border-color 0.3s;
         }
-        input[type="number"]:focus, select:focus {
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
             border-color: #3498db;
             outline: none;
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
@@ -89,6 +89,17 @@
         }
         .btn-download:hover {
             background-color: #8e44ad;
+        }
+        .btn-print {
+            background-color: #e67e22;
+            margin-top: 20px;
+            margin-left: 10px;
+            display: none;
+            font-size: 18px;
+            padding: 14px 24px;
+        }
+        .btn-print:hover {
+            background-color: #d35400;
         }
         .results-table {
             margin-top: 30px;
@@ -228,6 +239,9 @@
                 padding: 20px;
                 box-sizing: border-box;
             }
+            .no-print {
+                display: none !important;
+            }
         }
         
         /* Print preview container */
@@ -253,6 +267,7 @@
             box-sizing: border-box;
             background: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            font-size: 14px;
         }
         
         .print-header {
@@ -330,7 +345,7 @@
                 flex-direction: column;
                 align-items: stretch;
             }
-            input[type="number"], select {
+            input[type="text"], input[type="number"], select {
                 font-size: 16px;
             }
             .btn {
@@ -341,12 +356,26 @@
                 flex-direction: column;
                 gap: 10px;
             }
+            .download-container {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .btn-download, .btn-print {
+                margin-left: 0;
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <h1>Quintilla Group Loan Calculator</h1>
     <div class="calculator-container" id="calculator">
+        <div class="form-group">
+            <label>Client Name:</label>
+            <input type="text" id="clientName" placeholder="Enter client name">
+        </div>
+        
         <div class="form-group">
             <label>Total Outstanding Obligation (₱):</label>
             <input type="number" id="totalObligation" min="0" step="1000" placeholder="Enter amount">
@@ -451,6 +480,7 @@
         
         <div class="download-container">
             <button id="downloadBtn" class="btn btn-download">Download As PNG</button>
+            <button id="printBtn" class="btn btn-print">Print Results</button>
         </div>
     </div>
     
@@ -468,6 +498,7 @@
             const customRateGroup = document.getElementById('customRateGroup');
             const termButtons = document.querySelectorAll('.term-button');
             const downloadBtn = document.getElementById('downloadBtn');
+            const printBtn = document.getElementById('printBtn');
             const displayOptions = document.getElementById('displayOptions');
             const showInterestCheckbox = document.getElementById('showInterest');
             const showTotalPaymentCheckbox = document.getElementById('showTotalPayment');
@@ -475,6 +506,7 @@
             const calculatorPrint = document.getElementById('calculator-print');
             const closePreview = document.getElementById('closePreview');
             
+            const clientNameInput = document.getElementById('clientName');
             const totalObligationInput = document.getElementById('totalObligation');
             const reservationFeeInput = document.getElementById('reservationFee');
             const discountInput = document.getElementById('discount');
@@ -653,6 +685,7 @@
                 
                 // Store results for printing
                 currentResults = {
+                    clientName: clientNameInput.value || 'N/A',
                     totalObligation,
                     reservationFee,
                     discount,
@@ -675,8 +708,24 @@
                         <td class="payment-column">₱${formatNumber(total)}</td>
                     </tr>`;
                 
-                // Show download button
+                // Show download and print buttons
                 downloadBtn.style.display = 'inline-block';
+                printBtn.style.display = 'inline-block';
+            });
+            
+            // Print functionality
+            printBtn.addEventListener('click', function() {
+                if (!currentResults) {
+                    alert('Please calculate a loan first.');
+                    return;
+                }
+                
+                generatePrintPreview();
+                
+                // Wait a moment for the preview to render, then print
+                setTimeout(function() {
+                    window.print();
+                }, 500);
             });
             
             // Close print preview
@@ -745,12 +794,21 @@
                 
                 calculatorPrint.innerHTML = `
                     <div class="print-header">
-                        <h1>Loan Calculator Results</h1>
+                        <h1>Quintilla Group Loan Calculator</h1>
+                        <h2>Loan Calculation Results</h2>
                         <p>Generated on ${new Date().toLocaleDateString()}</p>
                     </div>
                     
                     <div class="print-section">
-                        <h2>Loan Details</h2>
+                        <h3>Client Information</h3>
+                        <div class="print-row">
+                            <div class="print-label">Client Name:</div>
+                            <div class="print-value">${currentResults.clientName}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="print-section">
+                        <h3>Loan Details</h3>
                         <div class="print-row">
                             <div class="print-label">Total Outstanding Obligation:</div>
                             <div class="print-value">₱${formatNumber(currentResults.totalObligation)}</div>
@@ -774,7 +832,7 @@
                     </div>
                     
                     <div class="print-section">
-                        <h2>Loan Summary</h2>
+                        <h3>Loan Summary</h3>
                         <table class="print-table">
                             <thead>
                                 <tr>
@@ -796,10 +854,13 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    <div class="print-section">
+                        <p><strong>Note:</strong> This calculation is for estimation purposes only. Actual loan terms may vary based on credit assessment and other factors.</p>
+                    </div>
                 `;
             }
         });
     </script>
 </body>
 </html>
-
