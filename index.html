@@ -222,6 +222,12 @@
             cursor: pointer;
             font-weight: normal;
         }
+        .property-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
         
         /* Print-specific styles */
         @media print {
@@ -418,6 +424,9 @@
                 margin-left: 0;
                 width: 100%;
             }
+            .property-details {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -427,6 +436,23 @@
         <div class="form-group">
             <label>Client Name:</label>
             <input type="text" id="clientName" placeholder="Enter client name">
+        </div>
+        
+        <div class="form-group">
+            <label>Project Name:</label>
+            <input type="text" id="projectName" placeholder="Enter project name">
+        </div>
+        
+        <div class="property-details">
+            <div class="form-group">
+                <label>Block:</label>
+                <input type="text" id="block" placeholder="Enter block">
+            </div>
+            
+            <div class="form-group">
+                <label>Lot:</label>
+                <input type="text" id="lot" placeholder="Enter lot">
+            </div>
         </div>
         
         <div class="form-group">
@@ -564,6 +590,9 @@
             const closePreview = document.getElementById('closePreview');
             
             const clientNameInput = document.getElementById('clientName');
+            const projectNameInput = document.getElementById('projectName');
+            const blockInput = document.getElementById('block');
+            const lotInput = document.getElementById('lot');
             const totalObligationInput = document.getElementById('totalObligation');
             const reservationFeeInput = document.getElementById('reservationFee');
             const discountInput = document.getElementById('discount');
@@ -743,6 +772,9 @@
                 // Store results for printing
                 currentResults = {
                     clientName: clientNameInput.value || 'N/A',
+                    projectName: projectNameInput.value || 'N/A',
+                    block: blockInput.value || 'N/A',
+                    lot: lotInput.value || 'N/A',
                     totalObligation,
                     reservationFee,
                     discount,
@@ -866,6 +898,22 @@
                         <div class="print-row">
                             <div class="print-label">Client Name:</div>
                             <div class="print-value">${currentResults.clientName}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="print-section">
+                        <h3>Property Details</h3>
+                        <div class="print-row">
+                            <div class="print-label">Project Name:</div>
+                            <div class="print-value">${currentResults.projectName}</div>
+                        </div>
+                        <div class="print-row">
+                            <div class="print-label">Block:</div>
+                            <div class="print-value">${currentResults.block}</div>
+                        </div>
+                        <div class="print-row">
+                            <div class="print-label">Lot:</div>
+                            <div class="print-value">${currentResults.lot}</div>
                         </div>
                     </div>
                     
