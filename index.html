@@ -228,10 +228,10 @@
             body * {
                 visibility: hidden;
             }
-            #calculator-print, #calculator-print * {
+            #print-container, #print-container * {
                 visibility: visible;
             }
-            #calculator-print {
+            #print-container {
                 position: absolute;
                 left: 0;
                 top: 0;
@@ -290,7 +290,7 @@
             box-sizing: border-box;
         }
         
-        #calculator-print {
+        #print-container, #screenshot-container {
             width: 8.5in;
             min-height: 11in;
             margin: 0 auto;
@@ -299,6 +299,11 @@
             background: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             font-size: 14px;
+        }
+        
+        #screenshot-container {
+            position: absolute;
+            left: -9999px;
         }
         
         .print-header {
@@ -535,8 +540,11 @@
     <!-- Print Preview Container -->
     <div id="print-preview">
         <button class="close-preview" id="closePreview">Close Preview</button>
-        <div id="calculator-print"></div>
+        <div id="print-container"></div>
     </div>
+    
+    <!-- Hidden container for screenshots -->
+    <div id="screenshot-container"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -551,7 +559,8 @@
             const showInterestCheckbox = document.getElementById('showInterest');
             const showTotalPaymentCheckbox = document.getElementById('showTotalPayment');
             const printPreview = document.getElementById('print-preview');
-            const calculatorPrint = document.getElementById('calculator-print');
+            const printContainer = document.getElementById('print-container');
+            const screenshotContainer = document.getElementById('screenshot-container');
             const closePreview = document.getElementById('closePreview');
             
             const clientNameInput = document.getElementById('clientName');
@@ -768,12 +777,8 @@
                     return;
                 }
                 
-                generatePrintPreview();
-                
-                // Wait a moment for the preview to render, then print
-                setTimeout(function() {
-                    window.print();
-                }, 500);
+                generatePrintContent(printContainer);
+                printPreview.style.display = 'block';
             });
             
             // Close print preview
@@ -793,13 +798,13 @@
                 downloadBtn.textContent = "Generating image...";
                 downloadBtn.disabled = true;
                 
-                // Generate print preview
-                generatePrintPreview();
+                // Generate content for screenshot
+                generatePrintContent(screenshotContainer);
                 
-                // Wait a moment for the preview to render
+                // Wait a moment for the content to render
                 setTimeout(function() {
-                    // Capture the print preview container
-                    html2canvas(calculatorPrint, {
+                    // Capture the screenshot container
+                    html2canvas(screenshotContainer, {
                         scale: 2, // Higher resolution
                         logging: false,
                         useCORS: true,
@@ -819,8 +824,8 @@
                         link.href = canvas.toDataURL('image/png');
                         link.click();
                         
-                        // Hide print preview
-                        printPreview.style.display = 'none';
+                        // Clear the screenshot container
+                        screenshotContainer.innerHTML = '';
                         
                         // Restore button text
                         downloadBtn.textContent = originalText;
@@ -828,19 +833,18 @@
                     }).catch(function(error) {
                         console.error('Error generating image:', error);
                         alert('Error generating image. Please try again.');
+                        // Clear the screenshot container
+                        screenshotContainer.innerHTML = '';
                         downloadBtn.textContent = originalText;
                         downloadBtn.disabled = false;
                     });
                 }, 500);
             });
             
-            function generatePrintPreview() {
+            function generatePrintContent(container) {
                 if (!currentResults) return;
                 
-                // Show print preview
-                printPreview.style.display = 'block';
-                
-                // Generate content for print preview
+                // Generate content for the container
                 const loanTypeText = {
                     'hmdf': 'HMDF (6.25% interest)',
                     'rcbc': 'RCBC (6.6% interest)',
@@ -850,7 +854,7 @@
                 const showInterest = document.getElementById('showInterest').checked;
                 const showTotalPayment = document.getElementById('showTotalPayment').checked;
                 
-                calculatorPrint.innerHTML = `
+                container.innerHTML = `
                     <div class="print-header">
                         <h1>Quintilla Group Loan Calculator</h1>
                         <h2>Loan Calculation Results</h2>
@@ -918,6 +922,18 @@
                     </div>
                 `;
             }
+            
+            // Handle the actual printing
+            window.addEventListener('afterprint', function() {
+                printPreview.style.display = 'none';
+            });
+            
+            // Add event listener for print button in preview
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && printPreview.style.display === 'block') {
+                    printPreview.style.display = 'none';
+                }
+            });
         });
     </script>
 </body>
