@@ -455,6 +455,18 @@
             </div>
         </div>
         
+        <div class="property-details">
+            <div class="form-group">
+                <label>Floor Area (sqm):</label>
+                <input type="number" id="floorArea" min="0" step="0.01" placeholder="Enter floor area">
+            </div>
+            
+            <div class="form-group">
+                <label>Lot Area (sqm):</label>
+                <input type="number" id="lotArea" min="0" step="0.01" placeholder="Enter lot area">
+            </div>
+        </div>
+        
         <div class="form-group">
             <label>Total Outstanding Obligation (₱):</label>
             <input type="number" id="totalObligation" min="0" step="1000" placeholder="Enter amount">
@@ -593,6 +605,8 @@
             const projectNameInput = document.getElementById('projectName');
             const blockInput = document.getElementById('block');
             const lotInput = document.getElementById('lot');
+            const floorAreaInput = document.getElementById('floorArea');
+            const lotAreaInput = document.getElementById('lotArea');
             const totalObligationInput = document.getElementById('totalObligation');
             const reservationFeeInput = document.getElementById('reservationFee');
             const discountInput = document.getElementById('discount');
@@ -775,6 +789,8 @@
                     projectName: projectNameInput.value || 'N/A',
                     block: blockInput.value || 'N/A',
                     lot: lotInput.value || 'N/A',
+                    floorArea: floorAreaInput.value || 'N/A',
+                    lotArea: lotAreaInput.value || 'N/A',
                     totalObligation,
                     reservationFee,
                     discount,
@@ -914,6 +930,14 @@
                         <div class="print-row">
                             <div class="print-label">Lot:</div>
                             <div class="print-value">${currentResults.lot}</div>
+                        </div>
+                        <div class="print-row">
+                            <div class="print-label">Floor Area:</div>
+                            <div class="print-value">${currentResults.floorArea} sqm</div>
+                        </div>
+                        <div class="print-row">
+                            <div class="print-label">Lot Area:</div>
+                            <div class="print-value">${currentResults.lotArea} sqm</div>
                         </div>
                     </div>
                     
