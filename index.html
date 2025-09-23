@@ -228,12 +228,6 @@
             gap: 15px;
             margin-bottom: 20px;
         }
-        .fee-inputs {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
         
         /* Print-specific styles */
         @media print {
@@ -430,7 +424,7 @@
                 margin-left: 0;
                 width: 100%;
             }
-            .property-details, .fee-inputs {
+            .property-details {
                 grid-template-columns: 1fr;
             }
         }
@@ -478,23 +472,24 @@
             <input type="number" id="totalObligation" min="0" step="1000" placeholder="Enter amount">
         </div>
         
-        <h3 class="section-title">Fees & Equity</h3>
+        <div class="form-group">
+            <label>Reservation Fee (₱):</label>
+            <input type="number" id="reservationFee" min="0" step="1000" value="0" placeholder="Enter fee">
+        </div>
         
-        <div class="fee-inputs">
-            <div class="form-group">
-                <label>Reservation Fee (₱):</label>
-                <input type="number" id="reservationFee" min="0" step="1000" value="0" placeholder="Enter fee">
-            </div>
-            
-            <div class="form-group">
-                <label>Equity Fee (₱):</label>
-                <input type="number" id="equityFee" min="0" step="1000" value="0" placeholder="Enter equity fee">
-            </div>
+        <div class="form-group">
+            <label>Equity Fee (₱):</label>
+            <input type="number" id="equityFee" min="0" step="1000" value="0" placeholder="Enter equity fee">
+        </div>
+        
+        <div class="form-group">
+            <label>Discount (₱):</label>
+            <input type="number" id="discount" min="0" step="1000" value="0" placeholder="Enter discount">
+            <div class="input-hint">Total Loanable Amount = Outstanding Obligation - Reservation Fee - Equity Fee - Discount</div>
         </div>
         
         <div class="loanable-amount">
             Total Loanable Amount: ₱<span id="loanableAmount">0.00</span>
-            <div class="input-hint">Formula: Outstanding Obligation - Reservation Fee - Equity Fee</div>
         </div>
         
         <div class="form-group">
@@ -620,6 +615,7 @@
             const totalObligationInput = document.getElementById('totalObligation');
             const reservationFeeInput = document.getElementById('reservationFee');
             const equityFeeInput = document.getElementById('equityFee');
+            const discountInput = document.getElementById('discount');
             const loanableAmountSpan = document.getElementById('loanableAmount');
             const specialTermInput = document.getElementById('specialTerm');
             
@@ -627,7 +623,7 @@
             let currentResults = null;
             
             // Update loanable amount when inputs change
-            [totalObligationInput, reservationFeeInput, equityFeeInput].forEach(input => {
+            [totalObligationInput, reservationFeeInput, equityFeeInput, discountInput].forEach(input => {
                 input.addEventListener('input', updateLoanableAmount);
             });
             
@@ -635,8 +631,9 @@
                 const totalObligation = parseFloat(totalObligationInput.value) || 0;
                 const reservationFee = parseFloat(reservationFeeInput.value) || 0;
                 const equityFee = parseFloat(equityFeeInput.value) || 0;
+                const discount = parseFloat(discountInput.value) || 0;
                 
-                const loanableAmount = totalObligation - reservationFee - equityFee;
+                const loanableAmount = totalObligation - reservationFee - equityFee - discount;
                 loanableAmountSpan.textContent = formatNumber(loanableAmount > 0 ? loanableAmount : 0);
                 
                 // Show display options if loanable amount is greater than 0
@@ -741,8 +738,9 @@
                 
                 const reservationFee = parseFloat(reservationFeeInput.value) || 0;
                 const equityFee = parseFloat(equityFeeInput.value) || 0;
+                const discount = parseFloat(discountInput.value) || 0;
                 
-                const amount = totalObligation - reservationFee - equityFee;
+                const amount = totalObligation - reservationFee - equityFee - discount;
                 
                 if (amount <= 0) {
                     alert('Loanable amount must be greater than 0.');
@@ -804,6 +802,7 @@
                     totalObligation,
                     reservationFee,
                     equityFee,
+                    discount,
                     amount,
                     loanType,
                     rate,
@@ -964,6 +963,10 @@
                         <div class="print-row">
                             <div class="print-label">Equity Fee:</div>
                             <div class="print-value">₱${formatNumber(currentResults.equityFee)}</div>
+                        </div>
+                        <div class="print-row">
+                            <div class="print-label">Discount:</div>
+                            <div class="print-value">₱${formatNumber(currentResults.discount)}</div>
                         </div>
                         <div class="print-row">
                             <div class="print-label">Total Loanable Amount:</div>
